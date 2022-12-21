@@ -1,0 +1,21 @@
+version: '3.9'
+services:
+  rtmp:
+    build: ./rtmp
+    ports:
+      - "1935:1935"
+    container_name: rtmp_server
+  api:
+    build: ./api
+    ports:
+      - "${ORIGIN_PORT}:80"
+    container_name: api_server
+    env_file:
+      - .env
+  edge:
+    build: ./api
+    ports:
+      - "${EDGE_PORT}:80"
+    container_name: edge_server
+    env_file:
+      - .env

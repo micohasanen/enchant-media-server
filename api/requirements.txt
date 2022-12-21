@@ -1,0 +1,7 @@
+fastapi>=0.78.0
+uvicorn>=0.18.2
+python-multipart>=0.0.5
+ffmpeg-python>=0.2.0
+m3u8
+beanie
+requests
