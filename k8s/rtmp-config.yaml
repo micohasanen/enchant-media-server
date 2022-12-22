@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rtmp-config
+data:
+  nginx.conf: |
+    worker_processes auto;
+    rtmp_auto_push on;
+    events {}
+    rtmp {
+      server {
+        listen 1935;
+        chunk_size 4096;
+        allow publish all;
+        allow play all;
+
+        application live {
+          live on;
+          record off;
+
+          on_publish http://localhost/rtmp/;
+          on_publish_done http://localhost/rtmp/end;
+        }
+      }
+    }

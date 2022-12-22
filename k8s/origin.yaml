@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: origin-server
+  labels:
+    app: origin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: origin
+  template:
+    metadata:
+      labels:
+        app: origin
+    spec:
+      containers:
+        - name: origin-server
+          image: micohasanen/enchant-media-server
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: DATABASE_URL
+            - name: ORIGIN_PORT
+              value: "8089"
+            - name: EDGE_PORT
+              value: "8088"
+            - name: USE_LOCALHOST
+              value: "True"
+        - name: nginx-rtmp
+          image: tiangolo/nginx-rtmp
+          ports:
+            - containerPort: 1935
+          volumeMounts:
+            - name: rtmp-conf
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+      volumes:
+        - name: rtmp-conf
+          configMap:
+            name: rtmp-config
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: origin-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: origin
+  ports:
+    - protocol: TCP
+      name: api
+      port: 8089
+      targetPort: 80
+    - protocol: TCP
+      name: rtmp
+      port: 1935
+      targetPort: 1935
+    # To allow RTMP to be sent over port 80
+    # to get through firewalls, uncomment
+    # - protocol: TCP
+    #   name: rtmp-over-http
+    #   port: 80
+    #   targetPort: 1935

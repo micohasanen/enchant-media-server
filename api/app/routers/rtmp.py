@@ -23,6 +23,10 @@ async def process_stream(name: str = Form(), app: str = Form(), addr: str = Form
 	if name == None or app == None:
 		return False
 
+	# Use localhost on k8s deployment inside same pod
+	if config.USE_LOCALHOST:
+		addr = 'localhost'
+
 	stream_url = f'rtmp://{addr}:1935/{app}/{name}'
 	logger.info(f'incoming {stream_url}')
 

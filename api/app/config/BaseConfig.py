@@ -10,6 +10,7 @@ class BaseConfig(BaseSettings):
         { "-resolution": "640x360", "-video_bitrate": "1200k" }
     ]
     read_timeout = '500000'
-    ORIGIN_PORT = os.environ['ORIGIN_PORT'] or '8089'
+    ORIGIN_PORT = os.environ.get('ORIGIN_PORT', '8089')
+    USE_LOCALHOST = bool(os.environ.get('USE_LOCALHOST', False))
 
 config = BaseConfig()
